@@ -1,0 +1,29 @@
+name: Auto Create PR
+
+on:
+  push:
+    branches:
+      - feature/**
+
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create \
+            --base main \
+            --head ${{ github.ref_name }} \
+            --title "PR from ${{ github.ref_name }}" \
+            --body "Auto created PR from branch ${{ github.ref_name }}" \
+          || echo "PR already exists"
