@@ -1,0 +1,30 @@
+name: CI Check
+
+on:
+  push:
+    branches:
+      - future
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Python Syntax Check
+        run: |
+          find . -name "*.py" -exec python -m py_compile {} \;
