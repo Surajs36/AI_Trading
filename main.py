@@ -24,17 +24,20 @@ def refresh_token():
 
 def connect_fyers():
     state.access_token = get_token_from_ssm()
-    state.fyers_api = fyersModel.FyersModel(
-        client_id=CLIENT_ID, token=state.access_token,
-        is_async=False, log_path="/home/ssm-user/trading_bot/logs"
-    )
     try:
-        if state.fyers_api.get_profile()['code'] == 200:
+        state.fyers_api = fyersModel.FyersModel(
+            client_id=CLIENT_ID, token=state.access_token,
+            is_async=False, log_path="/home/ssm-user/trading_bot/logs"
+        )
+        resp = state.fyers_api.get_profile()
+        if resp.get('code') == 200:
             print(f"API Connected. Trading: {SELECTED_INDEX} x {TRADE_QTY} qty")
             return True
-    except:
-        pass
-    print("API Connection Failed")
+        else:
+            print(f"API Connection Failed! Fyers Response: {resp}")
+    except Exception as e:
+        print(f"API Connection Exception: {e}")
+        print("HINT: If this says 'No such file or directory', make sure you created the logs folder: mkdir -p /home/ssm-user/trading_bot/logs")
     return False
 
 def main():
